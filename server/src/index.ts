@@ -7,6 +7,7 @@ import morgan from "morgan";
 
 /* Route Imports */
 import projectRoutes from "./routes/projectRoutes"
+import taskRoutes from "./routes/taskRoutes";
 
 /* Configurations */
 dotenv.config();
@@ -25,6 +26,7 @@ app.get("/", (req, res) => {
 });
 
 app.use("/projects", projectRoutes);
+app.use("/tasks", taskRoutes)
 
 /* Server */
 const port = Number(process.env.PORT) || 3000;
