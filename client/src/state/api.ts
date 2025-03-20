@@ -61,19 +61,22 @@ export interface Task {
 }
 
 export const api = createApi({
-    baseQuery: fetchBaseQuery({ baseUrl: process.env.NEXT_PUBLIC_API_URL }),
+    baseQuery: fetchBaseQuery({
+        baseUrl: process.env.NEXT_PUBLIC_API_BASE_URL }),
+
     reducerPath: "api",
     tagTypes: ["Projects", "Tasks"],
     endpoints: (build) => ({
+
         getProjects: build.query<Project[], void>({
             query: () => "projects",
-            providesTags: ["Projects"]
+            providesTags: ["Projects"],
         }),
         createProject: build.mutation<Project, Partial<Project>>({
             query: (project) => ({
                 url: "projects",
                 method: "POST",
-                body: project
+                body: project,
             }),
             invalidatesTags: ["Projects"]
         }),
@@ -92,16 +95,16 @@ export const api = createApi({
             }),
             invalidatesTags: ["Tasks"],
           }),
-          updateTaskStatus: build.mutation<Task, { taskId: number; status: string }>({
+        updateTaskStatus: build.mutation<Task, { taskId: number; status: string }>({
             query: ({ taskId, status }) => ({
-              url: `tasks/${taskId}/status`,
-              method: "PATCH",
-              body: { status },
+                url: `tasks/${taskId}/status`,
+                method: "PATCH",
+                body: { status },
             }),
-            invalidatesTags: (result, error, { taskId }) => [
-              { type: "Tasks", id: taskId },
+        invalidatesTags: (result, error, { taskId }) => [
+            { type: "Tasks", id: taskId },
             ],
-          }),
+        }),
     }),
 });
 
@@ -109,5 +112,5 @@ export const {
     useGetProjectsQuery,
     useCreateProjectMutation,
     useGetTasksQuery,
-     useCreateTaskMutation
+    useCreateTaskMutation
 } = api;
