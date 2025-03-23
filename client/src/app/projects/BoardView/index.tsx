@@ -182,7 +182,7 @@ const Task = ({ task }: TaskProps) => {
                 className="h-auto w-full rounded-t-md"
                 />
             )}
-             <div className="p-4 md:p-6">
+            <div className="p-4 md:p-6">
                 <div className="flex items-start justify-between">
                     <div className="flex flex-1 flex-wrap items-center gap-2">
                         {task.priority && <PriorityTag priority={task.priority} />}
