@@ -2,8 +2,7 @@
 
 import { useAppDispatch, useAppSelector } from "@/app/redux";
 import React, { useState } from "react";
-import { Icon,
-        LockIcon,
+import { LockIcon,
         LucideIcon,
         Home,
         X,
