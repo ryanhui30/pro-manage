@@ -17,7 +17,7 @@ const ProjectHeader = ({activeTab, setActiveTab}: Props) => {
         onClose={() => setIsModalNewProjectOpen(false)}
       />
     <div className="pb-6 pt-6 lg:pb-4 lg:pt-8">
-      <Header name="Product Design Development"
+      <Header name="Projects Board"
         buttonComponent={
           <button
             className="flex items-center rounded-md bg-blue-primary px-3 py-2"

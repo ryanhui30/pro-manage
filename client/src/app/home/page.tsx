@@ -60,7 +60,7 @@ const HomePage = () => {
 
   const taskDistribution = Object.keys(priorityCount).map((key) => ({
     name: key,
-    count: priorityCount[key],
+    Count: priorityCount[key],
   }));
 
   const statusCount = projects.reduce(
@@ -74,7 +74,7 @@ const HomePage = () => {
 
   const projectStatus = Object.keys(statusCount).map((key) => ({
     name: key,
-    count: statusCount[key],
+    Count : statusCount[key],
   }));
 
   const chartColors = isDarkMode
@@ -93,7 +93,7 @@ const HomePage = () => {
 
   return (
     <div className="container h-full w-[100%] bg-gray-100 bg-transparent p-8">
-      <Header name="Project Management Dashboard" />
+      <Header name="Dashboard" />
       <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
         <div className="rounded-lg bg-white p-4 shadow dark:bg-dark-secondary">
           <h3 className="mb-4 text-lg font-semibold dark:text-white">
@@ -114,7 +114,7 @@ const HomePage = () => {
                 }}
               />
               <Legend />
-              <Bar dataKey="count" fill={chartColors.bar} />
+              <Bar dataKey="Count" fill={chartColors.bar} />
             </BarChart>
           </ResponsiveContainer>
         </div>
@@ -124,7 +124,7 @@ const HomePage = () => {
           </h3>
           <ResponsiveContainer width="100%" height={300}>
             <PieChart>
-              <Pie dataKey="count" data={projectStatus} fill="#82ca9d" label>
+              <Pie dataKey="Count" data={projectStatus} fill="#82ca9d" label>
                 {projectStatus.map((entry, index) => (
                   <Cell
                     key={`cell-${index}`}
