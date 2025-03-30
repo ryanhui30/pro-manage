@@ -39,7 +39,7 @@ const Teams = () => {
 
   return (
     <div className="flex w-full flex-col p-8">
-      <Header name="Teams" />
+      <Header name="Teams List" />
       <div style={{ height: 650, width: "100%" }}>
         <DataGrid
           rows={teams || []}

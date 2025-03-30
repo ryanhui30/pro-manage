@@ -31,7 +31,7 @@ const Search = () => {
 
   return (
     <div className="p-8">
-      <Header name="Search" />
+      <Header name="Projects Search" />
       <div>
         <input
           type="text"
