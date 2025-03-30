@@ -35,6 +35,15 @@ const taskColumns: GridColDef[] = [
 
 const COLORS = ["#0088FE", "#00C49F", "#FFBB28", "#FF8042"];
 
+const GRADIENT_COLORS = [
+  '#4A90E2', // Start color
+  '#5E7CE8',
+  '#7268EE',
+  '#8653F4',
+  '#9A3EFA',
+  '#9013FE'  // End color
+];
+
 const HomePage = () => {
   const {
     data: tasks,
@@ -45,6 +54,12 @@ const HomePage = () => {
     useGetProjectsQuery();
 
   const isDarkMode = useAppSelector((state) => state.global.isDarkMode);
+
+  // Custom gradient function for bars
+  const getGradientColor = (index: number, total: number) => {
+    const colorIndex = Math.floor((index / total) * (GRADIENT_COLORS.length - 1));
+    return GRADIENT_COLORS[colorIndex];
+  };
 
   if (tasksLoading || isProjectsLoading) return <div>Loading..</div>;
   if (tasksError || !tasks || !projects) return <div>Error fetching data</div>;
@@ -77,24 +92,11 @@ const HomePage = () => {
     Count : statusCount[key],
   }));
 
-  const chartColors = isDarkMode
-    ? {
-        bar: "#8884d8",
-        barGrid: "#303030",
-        pieFill: "#4A90E2",
-        text: "#FFFFFF",
-      }
-    : {
-        bar: "#8884d8",
-        barGrid: "#E0E0E0",
-        pieFill: "#82ca9d",
-        text: "#000000",
-      };
-
   return (
     <div className="container h-full w-[100%] bg-gray-100 bg-transparent p-8">
       <Header name="Dashboard" />
       <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
+        {/* Task Priority Distribution - Bar Chart */}
         <div className="rounded-lg bg-white p-4 shadow dark:bg-dark-secondary">
           <h3 className="mb-4 text-lg font-semibold dark:text-white">
             Task Priority Distribution
@@ -103,40 +105,56 @@ const HomePage = () => {
             <BarChart data={taskDistribution}>
               <CartesianGrid
                 strokeDasharray="3 3"
-                stroke={chartColors.barGrid}
+                stroke={isDarkMode ? "#303030" : "#E0E0E0"}
               />
-              <XAxis dataKey="name" stroke={chartColors.text} />
-              <YAxis stroke={chartColors.text} />
+              <XAxis dataKey="name" stroke={isDarkMode ? "#FFFFFF" : "#000000"} />
+              <YAxis stroke={isDarkMode ? "#FFFFFF" : "#000000"} />
               <Tooltip
                 contentStyle={{
-                  width: "min-content",
-                  height: "min-content",
+                  backgroundColor: isDarkMode ? "#2D3748" : "#FFFFFF",
+                  borderColor: isDarkMode ? "#4A5568" : "#E2E8F0",
+                  color: isDarkMode ? "#FFFFFF" : "#000000",
                 }}
               />
               <Legend />
-              <Bar dataKey="Count" fill={chartColors.bar} />
+              <Bar dataKey="Count">
+                {taskDistribution.map((entry, index) => (
+                  <Cell
+                    key={`cell-${index}`}
+                    fill={getGradientColor(index, taskDistribution.length)}
+                  />
+                ))}
+              </Bar>
             </BarChart>
           </ResponsiveContainer>
         </div>
+
+        {/* Project Status - Pie Chart */}
         <div className="rounded-lg bg-white p-4 shadow dark:bg-dark-secondary">
           <h3 className="mb-4 text-lg font-semibold dark:text-white">
             Project Status
           </h3>
           <ResponsiveContainer width="100%" height={300}>
             <PieChart>
-              <Pie dataKey="Count" data={projectStatus} fill="#82ca9d" label>
+              <Pie
+                dataKey="Count"
+                data={projectStatus}
+                label={({ name, percent }) => `${name}: ${(percent * 100).toFixed(0)}%`}
+              >
                 {projectStatus.map((entry, index) => (
                   <Cell
                     key={`cell-${index}`}
-                    fill={COLORS[index % COLORS.length]}
+                    fill={getGradientColor(index, projectStatus.length)}
                   />
                 ))}
               </Pie>
-              <Tooltip />
+              <Tooltip
+              />
               <Legend />
             </PieChart>
           </ResponsiveContainer>
         </div>
+
         <div className="rounded-lg bg-white p-4 shadow dark:bg-dark-secondary md:col-span-2">
           <h3 className="mb-4 text-lg font-semibold dark:text-white">
             Your Tasks
