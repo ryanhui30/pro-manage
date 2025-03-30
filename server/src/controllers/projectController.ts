@@ -8,11 +8,8 @@ export const getProjects = async (
   res: Response
 ): Promise<void> => {
   try {
-    console.log("Attempting to fetch projects from the database..."); // Debug: Confirm database query is being attempted
     const projects = await prisma.project.findMany();
-    console.log("Projects retrieved successfully:", projects); // Debug: Log the retrieved data
 
-    res.json(projects);
   } catch (error: any) {
     res
       .status(500)

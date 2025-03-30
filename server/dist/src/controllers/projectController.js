@@ -14,10 +14,7 @@ const client_1 = require("@prisma/client");
 const prisma = new client_1.PrismaClient();
 const getProjects = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
-        console.log("Attempting to fetch projects from the database..."); // Debug: Confirm database query is being attempted
         const projects = yield prisma.project.findMany();
-        console.log("Projects retrieved successfully:", projects); // Debug: Log the retrieved data
-        res.json(projects);
     }
     catch (error) {
         res
