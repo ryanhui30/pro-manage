@@ -10,6 +10,7 @@ export const getProjects = async (
   try {
     const projects = await prisma.project.findMany();
 
+    res.json(projects);
   } catch (error: any) {
     res
       .status(500)
