@@ -20,10 +20,10 @@ const ProjectHeader = ({activeTab, setActiveTab}: Props) => {
       <Header name="Projects Board"
         buttonComponent={
           <button
-            className="flex items-center rounded-md bg-blue-primary px-3 py-2"
+            className="flex items-center mr-3 rounded bg-blue-500 px-4 py-2 font-bold text-white hover:bg-blue-700"
             onClick={()=> setIsModalNewProjectOpen(true)}
           >
-            <PlusSquare className="mr-2 h-5 w-5" /> New Boards
+            <PlusSquare className="mr-2 h-5 w-5" /> Add Project
           </button>
         }
       />

@@ -11,6 +11,7 @@ import {
   useGetTasksByUserQuery,
 } from "@/state/api";
 import { DataGrid, GridColDef } from "@mui/x-data-grid";
+import { PlusSquare } from "lucide-react";
 import React, { useState } from "react";
 
 type Props = {
@@ -99,10 +100,10 @@ const ReusablePriorityPage = ({ priority }: Props) => {
         name="Priority Page"
         buttonComponent={
           <button
-            className="mr-3 rounded bg-blue-500 px-4 py-2 font-bold text-white hover:bg-blue-700"
+            className="flex items-center  mr-3 rounded bg-blue-500 px-4 py-2 font-bold text-white hover:bg-blue-700"
             onClick={() => setIsModalNewTaskOpen(true)}
           >
-            Add Task
+            <PlusSquare className="mr-2 h-5 w-5" /> Add Task
           </button>
         }
       />
