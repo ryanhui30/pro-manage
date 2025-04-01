@@ -2,6 +2,7 @@ import { useAppSelector } from "@/app/redux";
 import { useGetTasksQuery } from "@/state/api";
 import { DisplayOption, Gantt, ViewMode } from "gantt-task-react";
 import "gantt-task-react/dist/index.css";
+import { PlusSquare } from "lucide-react";
 import React, { useMemo, useState } from "react";
 
 type Props = {
@@ -81,11 +82,11 @@ const Timeline = ({ id, setIsModalNewTaskOpen }: Props) => {
           />
         </div>
         <div className="px-4 pb-5 pt-1">
-          <button
-            className="flex items-center rounded bg-blue-primary px-3 py-2 text-white hover:bg-blue-600"
+        <button
+            className="flex items-center  mr-3 rounded bg-blue-500 px-4 py-2 font-bold text-white hover:bg-blue-700"
             onClick={() => setIsModalNewTaskOpen(true)}
           >
-            Add New Task
+            <PlusSquare className="mr-2 h-5 w-5" /> Add Task
           </button>
         </div>
       </div>

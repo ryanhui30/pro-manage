@@ -30,11 +30,11 @@ import ModalNewTask from "@/components/ModalNewTask";
 import { PlusSquare } from "lucide-react";
 
 const PRIORITY_COLORS: Record<Priority, string> = {
-  Backlog: "#4D96FF",
-  Low: "#6BCB77",
-  Medium: "#FFD93D",
-  High: "#FF6B6B",
-  Urgent: "#C68EFD",
+  Backlog: "#909090",
+  Low: "#4D96FF",
+  Medium: "#6BCB77",
+  High: "#FFD93D",
+  Urgent: "#FF6B6B",
 };
 
 const COLORS = ["#0088FE", "#00C49F", "#FFBB28", "#FF8042"];
