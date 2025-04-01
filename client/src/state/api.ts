@@ -120,8 +120,17 @@ export const api = createApi({
                 method: "PATCH",
                 body: { status },
             }),
-        invalidatesTags: (result, error, { taskId }) => [
-            { type: "Tasks", id: taskId },
+            invalidatesTags: (result, error, { taskId }) => [
+                { type: "Tasks", id: taskId },
+            ],
+        }),
+        deleteTask: build.mutation<void, { taskId: number }>({
+            query: ({ taskId }) => ({
+                url: `tasks/${taskId}`,
+                method: 'DELETE',
+            }),
+            invalidatesTags: (result, error, { taskId }) => [
+                { type: 'Tasks', id: taskId },
             ],
         }),
         getUsers:build.query<User[], void>({
@@ -134,7 +143,7 @@ export const api = createApi({
         }),
         search: build.query<SearchResults, string>({
             query: (query) => `search?query=${query}`,
-        })
+        }),
     }),
 });
 
@@ -144,6 +153,7 @@ export const {
     useGetTasksQuery,
     useCreateTaskMutation,
     useUpdateTaskStatusMutation,
+    useDeleteTaskMutation,
     useSearchQuery,
     useGetUsersQuery,
     useGetTeamsQuery,
