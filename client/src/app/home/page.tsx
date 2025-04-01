@@ -29,20 +29,66 @@ import { dataGridClassNames, dataGridSxStyles } from "@/lib/utils";
 import ModalNewTask from "@/components/ModalNewTask";
 import { PlusSquare } from "lucide-react";
 
+const PRIORITY_COLORS: Record<Priority, string> = {
+  Backlog: "#4D96FF",
+  Low: "#6BCB77",
+  Medium: "#FFD93D",
+  High: "#FF6B6B",
+  Urgent: "#C68EFD",
+};
+
 const COLORS = ["#0088FE", "#00C49F", "#FFBB28", "#FF8042"];
 
 const HomePage = () => {
-  // All hooks called at the top
   const [isModalNewTaskOpen, setIsModalNewTaskOpen] = useState(false);
+  const [selectedProjectId, setSelectedProjectId] = useState<number>(1);
+  const isDarkMode = useAppSelector((state) => state.global.isDarkMode);
+
+  // Data fetching
   const {
-    data: tasks,
+    data: tasks = [],
     isLoading: tasksLoading,
     isError: tasksError,
     refetch: refetchTasks,
-  } = useGetTasksQuery({ projectId: 1 }); // Changed to number
-  const { data: projects, isLoading: isProjectsLoading } = useGetProjectsQuery();
-  const isDarkMode = useAppSelector((state) => state.global.isDarkMode);
+  } = useGetTasksQuery({ projectId: selectedProjectId });
+
+  const {
+    data: projects = [],
+    isLoading: isProjectsLoading,
+    isError: projectsError,
+  } = useGetProjectsQuery();
+
   const [deleteTask] = useDeleteTaskMutation();
+
+  // Task columns with priority color and delete button
+  const taskColumns: GridColDef[] = [
+    { field: "title", headerName: "Title", width: 200 },
+    { field: "status", headerName: "Status", width: 150 },
+    {
+      field: "priority",
+      headerName: "Priority",
+      width: 150,
+      renderCell: (params) => (
+        <span style={{ color: PRIORITY_COLORS[params.value as Priority] || '#000' }}>
+          {params.value}
+        </span>
+      )
+    },
+    { field: "dueDate", headerName: "Due Date", width: 150 },
+    {
+      field: "actions",
+      headerName: "Actions",
+      width: 100,
+      renderCell: (params) => (
+        <button
+          onClick={() => handleDeleteTask(params.row.id)}
+          className="text-red-500 hover:text-red-700"
+        >
+          Delete
+        </button>
+      ),
+    },
+  ];
 
   const handleDeleteTask = async (taskId: number) => {
     if (!window.confirm("Are you sure you want to delete this task?")) {
@@ -58,29 +104,10 @@ const HomePage = () => {
     }
   };
 
-  const taskColumns: GridColDef[] = [
-    { field: "title", headerName: "Title", width: 200 },
-    { field: "status", headerName: "Status", width: 150 },
-    { field: "priority", headerName: "Priority", width: 150 },
-    { field: "dueDate", headerName: "Due Date", width: 150 },
-    {
-      field: "actions",
-      headerName: "Actions",
-      width: 100,
-      renderCell: (params) => (
-        <button
-          onClick={() => handleDeleteTask(params.row.id as number)}
-          className="text-red-500 hover:text-red-700"
-        >
-          Delete
-        </button>
-      ),
-    },
-  ];
-
   if (tasksLoading || isProjectsLoading) return <div>Loading..</div>;
-  if (tasksError || !tasks || !projects) return <div>Error fetching data</div>;
+  if (tasksError || projectsError || !tasks || !projects) return <div>Error fetching data</div>;
 
+  // Data calculations
   const priorityCount = tasks.reduce(
     (acc: Record<string, number>, task: Task) => {
       const { priority } = task;
@@ -112,7 +139,7 @@ const HomePage = () => {
   const chartColors = isDarkMode
     ? {
         bar: "#8884d8",
-        barGrid: "#303030",
+        barGrid: "#FFFFFF",
         pieFill: "#4A90E2",
         text: "#FFFFFF",
       }
@@ -125,7 +152,23 @@ const HomePage = () => {
 
   return (
     <div className="container h-full w-[100%] bg-gray-100 bg-transparent p-8">
-      <Header name="Dashboard" />
+      <div className="flex justify-between items-center mb-4">
+        <Header name="Dashboard" />
+        <div className="flex items-center gap-4">
+          <select
+            value={selectedProjectId}
+            onChange={(e) => setSelectedProjectId(Number(e.target.value))}
+            className="px-4 py-2 text-lg border rounded-lg dark:bg-dark-secondary dark:text-white min-w-[200px]"
+          >
+            {projects.map((project) => (
+              <option key={project.id} value={project.id}>
+                {project.name || `Project ${project.id}`}
+              </option>
+            ))}
+          </select>
+        </div>
+      </div>
+
       <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
         <div className="rounded-lg bg-white p-4 shadow dark:bg-dark-secondary">
           <h3 className="mb-4 text-lg font-semibold dark:text-white">
@@ -133,10 +176,7 @@ const HomePage = () => {
           </h3>
           <ResponsiveContainer width="100%" height={300}>
             <BarChart data={taskDistribution}>
-              <CartesianGrid
-                strokeDasharray="3 3"
-                stroke={chartColors.barGrid}
-              />
+              <CartesianGrid strokeDasharray="3 3" stroke={chartColors.barGrid} />
               <XAxis dataKey="name" stroke={chartColors.text} />
               <YAxis stroke={chartColors.text} />
               <Tooltip
@@ -145,14 +185,31 @@ const HomePage = () => {
                   height: "min-content",
                 }}
               />
-              <Legend />
-              <Bar dataKey="Count" fill={chartColors.bar} />
+              <Legend
+                wrapperStyle={{
+                  color: isDarkMode ? '#FFFFFF' : '#000000'
+                }}
+                formatter={(value) => (
+                  <span style={{ color: isDarkMode ? '#FFFFFF' : '#000000' }}>
+                    {value}
+                  </span>
+                )}
+              />
+              <Bar dataKey="Count" name="Task Count">
+                {taskDistribution.map((entry, index) => (
+                  <Cell
+                    key={`cell-${index}`}
+                    fill={PRIORITY_COLORS[entry.name as Priority] || COLORS[index % COLORS.length]}
+                  />
+                ))}
+              </Bar>
             </BarChart>
           </ResponsiveContainer>
         </div>
+
         <div className="rounded-lg bg-white p-4 shadow dark:bg-dark-secondary">
           <h3 className="mb-4 text-lg font-semibold dark:text-white">
-            Project Status
+            Projects Status
           </h3>
           <ResponsiveContainer width="100%" height={300}>
             <PieChart>
@@ -165,13 +222,18 @@ const HomePage = () => {
                 ))}
               </Pie>
               <Tooltip />
-              <Legend />
+              <Legend
+                wrapperStyle={{
+                  color: isDarkMode ? '#FFFFFF' : '#000000'
+                }}
+              />
             </PieChart>
           </ResponsiveContainer>
         </div>
+
         <div className="rounded-lg bg-white p-4 shadow dark:bg-dark-secondary md:col-span-2">
-          <div className="flex items-center justify-between">
-            <h3 className="mb-4 text-lg font-semibold dark:text-white">
+          <div className="flex justify-between items-center mb-4">
+            <h3 className="text-lg font-semibold dark:text-white">
               Your Tasks
             </h3>
             <button
@@ -193,12 +255,13 @@ const HomePage = () => {
               sx={dataGridSxStyles(isDarkMode)}
             />
           </div>
-          <ModalNewTask
-            isOpen={isModalNewTaskOpen}
-            onClose={() => setIsModalNewTaskOpen(false)}
-          />
         </div>
       </div>
+
+      <ModalNewTask
+        isOpen={isModalNewTaskOpen}
+        onClose={() => setIsModalNewTaskOpen(false)}
+      />
     </div>
   );
 };
