@@ -113,13 +113,10 @@ export const getUserTasks = async (
   }
 };
 
-export const deleteTask = async (
-  req: Request,
-  res: Response
-): Promise<void> => {
+export const deleteTask = async (req: Request, res: Response): Promise<void> => {
   const { taskId } = req.params;
+
   try {
-    // First delete related records to maintain referential integrity
     await prisma.comment.deleteMany({
       where: { taskId: Number(taskId) }
     });
@@ -128,20 +125,26 @@ export const deleteTask = async (
       where: { taskId: Number(taskId) }
     });
 
-    // Then delete the task
+    await prisma.taskAssignment.deleteMany({
+      where: { taskId: Number(taskId) }
+    });
+
     const deletedTask = await prisma.task.delete({
-      where: {
-        id: Number(taskId),
-      },
+      where: { id: Number(taskId) }
     });
 
     res.status(200).json({
+      success: true,
       message: 'Task deleted successfully',
-      deletedTask
+      data: deletedTask
     });
+
   } catch (error: any) {
+    console.error("Delete task error:", error);
     res.status(500).json({
-      message: `Error deleting task: ${error.message}`
+      success: false,
+      message: 'Failed to delete task',
+      error: process.env.NODE_ENV === 'development' ? error.message : undefined
     });
   }
 };

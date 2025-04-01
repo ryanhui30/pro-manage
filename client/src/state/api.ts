@@ -124,14 +124,12 @@ export const api = createApi({
                 { type: "Tasks", id: taskId },
             ],
         }),
-        deleteTask: build.mutation<void, { taskId: number }>({
-            query: ({ taskId }) => ({
-                url: `tasks/${taskId}`,
-                method: 'DELETE',
+        deleteTask: build.mutation<void, number>({
+            query: (taskId) => ({
+              url: `tasks/${taskId}`,
+              method: 'DELETE',
             }),
-            invalidatesTags: (result, error, { taskId }) => [
-                { type: 'Tasks', id: taskId },
-            ],
+            invalidatesTags: ['Tasks'],
         }),
         getUsers:build.query<User[], void>({
             query: () => "users",

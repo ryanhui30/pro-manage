@@ -6,8 +6,9 @@ import {
   Task,
   useGetProjectsQuery,
   useGetTasksQuery,
+  useDeleteTaskMutation,
 } from "@/state/api";
-import React from "react";
+import React, { useState } from "react";
 import { useAppSelector } from "../redux";
 import { DataGrid, GridColDef } from "@mui/x-data-grid";
 import Header from "@/components/Header";
@@ -25,26 +26,57 @@ import {
   YAxis,
 } from "recharts";
 import { dataGridClassNames, dataGridSxStyles } from "@/lib/utils";
-
-const taskColumns: GridColDef[] = [
-  { field: "title", headerName: "Title", width: 200 },
-  { field: "status", headerName: "Status", width: 150 },
-  { field: "priority", headerName: "Priority", width: 150 },
-  { field: "dueDate", headerName: "Due Date", width: 150 },
-];
+import ModalNewTask from "@/components/ModalNewTask";
+import { PlusSquare } from "lucide-react";
 
 const COLORS = ["#0088FE", "#00C49F", "#FFBB28", "#FF8042"];
 
 const HomePage = () => {
+  // All hooks called at the top
+  const [isModalNewTaskOpen, setIsModalNewTaskOpen] = useState(false);
   const {
     data: tasks,
     isLoading: tasksLoading,
     isError: tasksError,
-  } = useGetTasksQuery({ projectId: parseInt("1") });
-  const { data: projects, isLoading: isProjectsLoading } =
-    useGetProjectsQuery();
-
+    refetch: refetchTasks,
+  } = useGetTasksQuery({ projectId: 1 }); // Changed to number
+  const { data: projects, isLoading: isProjectsLoading } = useGetProjectsQuery();
   const isDarkMode = useAppSelector((state) => state.global.isDarkMode);
+  const [deleteTask] = useDeleteTaskMutation();
+
+  const handleDeleteTask = async (taskId: number) => {
+    if (!window.confirm("Are you sure you want to delete this task?")) {
+      return;
+    }
+
+    try {
+      await deleteTask(taskId).unwrap();
+      alert("Task deleted successfully");
+      refetchTasks();
+    } catch {
+      alert("Failed to delete task. Please try again.");
+    }
+  };
+
+  const taskColumns: GridColDef[] = [
+    { field: "title", headerName: "Title", width: 200 },
+    { field: "status", headerName: "Status", width: 150 },
+    { field: "priority", headerName: "Priority", width: 150 },
+    { field: "dueDate", headerName: "Due Date", width: 150 },
+    {
+      field: "actions",
+      headerName: "Actions",
+      width: 100,
+      renderCell: (params) => (
+        <button
+          onClick={() => handleDeleteTask(params.row.id as number)}
+          className="text-red-500 hover:text-red-700"
+        >
+          Delete
+        </button>
+      ),
+    },
+  ];
 
   if (tasksLoading || isProjectsLoading) return <div>Loading..</div>;
   if (tasksError || !tasks || !projects) return <div>Error fetching data</div>;
@@ -55,7 +87,7 @@ const HomePage = () => {
       acc[priority as Priority] = (acc[priority as Priority] || 0) + 1;
       return acc;
     },
-    {},
+    {}
   );
 
   const taskDistribution = Object.keys(priorityCount).map((key) => ({
@@ -69,12 +101,12 @@ const HomePage = () => {
       acc[status] = (acc[status] || 0) + 1;
       return acc;
     },
-    {},
+    {}
   );
 
   const projectStatus = Object.keys(statusCount).map((key) => ({
     name: key,
-    Count : statusCount[key],
+    Count: statusCount[key],
   }));
 
   const chartColors = isDarkMode
@@ -138,9 +170,17 @@ const HomePage = () => {
           </ResponsiveContainer>
         </div>
         <div className="rounded-lg bg-white p-4 shadow dark:bg-dark-secondary md:col-span-2">
-          <h3 className="mb-4 text-lg font-semibold dark:text-white">
-            Your Tasks
-          </h3>
+          <div className="flex items-center justify-between">
+            <h3 className="mb-4 text-lg font-semibold dark:text-white">
+              Your Tasks
+            </h3>
+            <button
+              className="flex items-center rounded bg-blue-500 px-4 py-2 font-bold text-white hover:bg-blue-700"
+              onClick={() => setIsModalNewTaskOpen(true)}
+            >
+              <PlusSquare className="mr-2 h-5 w-5" /> Add Task
+            </button>
+          </div>
           <div style={{ height: 400, width: "100%" }}>
             <DataGrid
               rows={tasks}
@@ -153,6 +193,10 @@ const HomePage = () => {
               sx={dataGridSxStyles(isDarkMode)}
             />
           </div>
+          <ModalNewTask
+            isOpen={isModalNewTaskOpen}
+            onClose={() => setIsModalNewTaskOpen(false)}
+          />
         </div>
       </div>
     </div>
