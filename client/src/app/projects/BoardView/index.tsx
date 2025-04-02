@@ -10,18 +10,11 @@ import Image from "next/image";
 type BoardProps = {
     id: string;
     setIsModalNewTaskOpen: (isOpen: boolean) => void;
-    setIsModalEditTaskOpen: (isOpen: boolean) => void;
-    setSelectedTask: (task: TaskType) => void;
 };
 
 const taskStatus = ["To Do", "Work In Progress", "Under Review", "Complete"];
 
-const BoardView = ({
-    id,
-    setIsModalNewTaskOpen,
-    setIsModalEditTaskOpen,
-    setSelectedTask
-}: BoardProps ) => {
+const BoardView = ({ id, setIsModalNewTaskOpen }: BoardProps ) => {
     const {
         data: tasks,
         isLoading,
@@ -46,8 +39,6 @@ const BoardView = ({
                         tasks={tasks || []}
                         moveTask={moveTask}
                         setIsModalNewTaskOpen={setIsModalNewTaskOpen}
-                        setIsModalEditTaskOpen={setIsModalEditTaskOpen}
-                        setSelectedTask={setSelectedTask}
                     />
                 ))}
             </div>
@@ -60,8 +51,6 @@ type TaskColumnProps = {
     tasks: TaskType[];
     moveTask: (taskId: number, toStatus: string) => void;
     setIsModalNewTaskOpen: (isOpen: boolean) => void;
-    setIsModalEditTaskOpen: (isOpen: boolean) => void;
-    setSelectedTask: (task: TaskType) => void;
 }
 
 const TaskColumn = ({
@@ -69,8 +58,6 @@ const TaskColumn = ({
     tasks,
     moveTask,
     setIsModalNewTaskOpen,
-    setIsModalEditTaskOpen,
-    setSelectedTask,
 }: TaskColumnProps) => {
     const [{ isOver }, drop] = useDrop(() => ({
         accept: "task",
@@ -101,11 +88,6 @@ const TaskColumn = ({
         } catch {
             alert("Failed to delete task. Please try again.");
         }
-    };
-
-    const handleEditTask = (task: TaskType) => {
-        setSelectedTask(task);
-        setIsModalEditTaskOpen(true);
     };
 
     return (
@@ -146,14 +128,13 @@ const TaskColumn = ({
                     key={task.id}
                     task={task}
                     onDelete={handleDeleteTask}
-                    onEdit={() => handleEditTask(task)}
                 />
             ))}
         </div>
     );
 };
 
-const TaskMenu = ({ onDelete, onEdit }: { onDelete: () => void; onEdit: () => void }) => {
+const TaskMenu = ({ onDelete }: { onDelete: () => void }) => {
     const [isOpen, setIsOpen] = useState(false);
     const menuRef = useRef<HTMLDivElement>(null);
 
@@ -184,15 +165,6 @@ const TaskMenu = ({ onDelete, onEdit }: { onDelete: () => void; onEdit: () => vo
                     <div className="py-1">
                         <button
                             onClick={() => {
-                                onEdit();
-                                setIsOpen(false);
-                            }}
-                            className="block w-full px-4 py-2 text-left text-sm text-gray-700 hover:bg-gray-100 dark:text-white dark:hover:bg-dark-secondary"
-                        >
-                            Edit
-                        </button>
-                        <button
-                            onClick={() => {
                                 onDelete();
                                 setIsOpen(false);
                             }}
@@ -210,10 +182,9 @@ const TaskMenu = ({ onDelete, onEdit }: { onDelete: () => void; onEdit: () => vo
 type TaskProps = {
     task: TaskType;
     onDelete?: (taskId: number) => void;
-    onEdit?: () => void;
 };
 
-const Task = ({ task, onDelete, onEdit }: TaskProps) => {
+const Task = ({ task, onDelete }: TaskProps) => {
     const [{ isDragging }, drag] = useDrag(() => ({
         type: "task",
         item: { id: task.id },
@@ -292,7 +263,7 @@ const Task = ({ task, onDelete, onEdit }: TaskProps) => {
                             ))}
                         </div>
                     </div>
-                    <TaskMenu onDelete={handleDelete} onEdit={onEdit || (() => {})} />
+                    <TaskMenu onDelete={handleDelete} />
                 </div>
 
                 <div className="my-3 flex justify-between">
