@@ -39,3 +39,48 @@ export const createProject = async (
         .json({ message: `Error creating a project: ${error.message}` });
     }
 };
+
+export const deleteProject = async (req: Request, res: Response): Promise<void> => {
+  const { projectId } = req.params;
+
+  try {
+    // First verify the project exists
+    const existingProject = await prisma.project.findUnique({
+      where: { id: Number(projectId) }
+    });
+
+    if (!existingProject) {
+      res.status(404).json({ message: 'Project not found' });
+      return;
+    }
+
+    // Then proceed with deletion
+    await prisma.$transaction([
+      prisma.comment.deleteMany({
+        where: { task: { projectId: Number(projectId) } }
+      }),
+      prisma.attachment.deleteMany({
+        where: { task: { projectId: Number(projectId) } }
+      }),
+      prisma.taskAssignment.deleteMany({
+        where: { task: { projectId: Number(projectId) } }
+      }),
+      prisma.task.deleteMany({
+        where: { projectId: Number(projectId) }
+      }),
+      prisma.project.delete({
+        where: { id: Number(projectId) }
+      })
+    ]);
+
+    res.status(200).json({
+      message: 'Project and all related data deleted successfully'
+    });
+  } catch (error: any) {
+    console.error('Full error:', error);
+    res.status(500).json({
+      message: `Error deleting project: ${error.message}`,
+      details: error
+    });
+  }
+};

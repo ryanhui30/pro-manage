@@ -1,7 +1,7 @@
 import React, { ReactNode } from 'react';
 
 type Props = {
-    name: string;
+    name: React.ReactNode;  // Changed from string to ReactNode
     buttonComponent?: ReactNode;
     isSmallText?: boolean;
 }

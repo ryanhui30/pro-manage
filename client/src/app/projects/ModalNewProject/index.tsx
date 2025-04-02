@@ -2,6 +2,7 @@ import Modal from "@/components/Modal";
 import { useCreateProjectMutation } from "@/state/api";
 import React, { useState } from "react";
 import { formatISO } from "date-fns";
+import { useRouter } from "next/navigation";
 
 type Props = {
   isOpen: boolean;
@@ -14,23 +15,43 @@ const ModalNewProject = ({ isOpen, onClose }: Props) => {
   const [description, setDescription] = useState("");
   const [startDate, setStartDate] = useState("");
   const [endDate, setEndDate] = useState("");
+  const router = useRouter();
 
   const handleSubmit = async () => {
     if (!projectName || !startDate || !endDate) return;
 
-    const formattedStartDate = formatISO(new Date(startDate), {
-      representation: "complete",
-    });
-    const formattedEndDate = formatISO(new Date(endDate), {
-      representation: "complete",
-    });
+    try {
+      const formattedStartDate = formatISO(new Date(startDate), {
+        representation: "complete",
+      });
+      const formattedEndDate = formatISO(new Date(endDate), {
+        representation: "complete",
+      });
 
-    await createProject({
-      name: projectName,
-      description,
-      startDate: formattedStartDate,
-      endDate: formattedEndDate,
-    });
+      const response = await createProject({
+        name: projectName,
+        description,
+        startDate: formattedStartDate,
+        endDate: formattedEndDate,
+      }).unwrap();
+
+      // Reset form
+      setProjectName("");
+      setDescription("");
+      setStartDate("");
+      setEndDate("");
+
+      // Close modal
+      onClose();
+
+      // Redirect to the new project page
+      if (response && response.id) {
+        router.push(`/projects/${response.id}`);
+      }
+
+    } catch (error) {
+      console.error("Error creating project:", error);
+    }
   };
 
   const isFormValid = () => {
@@ -52,29 +73,39 @@ const ModalNewProject = ({ isOpen, onClose }: Props) => {
         <input
           type="text"
           className={inputStyles}
-          placeholder="Project Name"
+          placeholder="Project Name *"
           value={projectName}
           onChange={(e) => setProjectName(e.target.value)}
         />
         <textarea
           className={inputStyles}
-          placeholder="Description"
+          placeholder="Description *"
           value={description}
           onChange={(e) => setDescription(e.target.value)}
         />
         <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 sm:gap-2">
-          <input
-            type="date"
-            className={inputStyles}
-            value={startDate}
-            onChange={(e) => setStartDate(e.target.value)}
-          />
-          <input
-            type="date"
-            className={inputStyles}
-            value={endDate}
-            onChange={(e) => setEndDate(e.target.value)}
-          />
+          <div className="space-y-1">
+            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">
+              Start Date *
+            </label>
+            <input
+              type="date"
+              className={inputStyles}
+              value={startDate}
+              onChange={(e) => setStartDate(e.target.value)}
+            />
+          </div>
+          <div className="space-y-1">
+            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">
+              Due Date *
+            </label>
+            <input
+              type="date"
+              className={inputStyles}
+              value={endDate}
+              onChange={(e) => setEndDate(e.target.value)}
+            />
+          </div>
         </div>
         <button
           type="submit"

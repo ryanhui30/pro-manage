@@ -105,28 +105,38 @@ const ModalNewTask = ({ isOpen, onClose, id = null }: Props) => {
         />
 
         <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 sm:gap-2">
-          <select
-            className={selectStyles}
-            value={status}
-            onChange={(e) => setStatus(Status[e.target.value as keyof typeof Status])}
-          >
-            <option value={Status.ToDo}>To Do</option>
-            <option value={Status.WorkInProgress}>Work In Progress</option>
-            <option value={Status.UnderReview}>Under Review</option>
-            <option value={Status.Completed}>Completed</option>
-          </select>
+          <div>
+            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+              Status
+            </label>
+            <select
+              className={selectStyles}
+              value={status}
+              onChange={(e) => setStatus(Status[e.target.value as keyof typeof Status])}
+            >
+              <option value={Status.ToDo}>To Do</option>
+              <option value={Status.WorkInProgress}>Work In Progress</option>
+              <option value={Status.UnderReview}>Under Review</option>
+              <option value={Status.Completed}>Completed</option>
+            </select>
+          </div>
 
-          <select
-            className={selectStyles}
-            value={priority}
-            onChange={(e) => setPriority(Priority[e.target.value as keyof typeof Priority])}
-          >
-            <option value={Priority.Urgent}>Urgent</option>
-            <option value={Priority.High}>High</option>
-            <option value={Priority.Medium}>Medium</option>
-            <option value={Priority.Low}>Low</option>
-            <option value={Priority.Backlog}>Backlog</option>
-          </select>
+          <div>
+            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+              Priority
+            </label>
+            <select
+              className={selectStyles}
+              value={priority}
+              onChange={(e) => setPriority(Priority[e.target.value as keyof typeof Priority])}
+            >
+              <option value={Priority.Urgent}>Urgent</option>
+              <option value={Priority.High}>High</option>
+              <option value={Priority.Medium}>Medium</option>
+              <option value={Priority.Low}>Low</option>
+              <option value={Priority.Backlog}>Backlog</option>
+            </select>
+          </div>
         </div>
 
         <input
@@ -138,46 +148,68 @@ const ModalNewTask = ({ isOpen, onClose, id = null }: Props) => {
         />
 
         <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 sm:gap-2">
-          <input
-            type="date"
-            className={inputStyles}
-            value={startDate}
-            onChange={(e) => setStartDate(e.target.value)}
-          />
-          <input
-            type="date"
-            className={inputStyles}
-            value={dueDate}
-            onChange={(e) => setDueDate(e.target.value)}
-          />
+          <div className="space-y-1">
+            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">
+              Start Date *
+            </label>
+            <input
+              type="date"
+              className={inputStyles}
+              value={startDate}
+              onChange={(e) => setStartDate(e.target.value)}
+            />
+          </div>
+          <div className="space-y-1">
+            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">
+              Due Date *
+            </label>
+            <input
+              type="date"
+              className={inputStyles}
+              value={dueDate}
+              onChange={(e) => setDueDate(e.target.value)}
+            />
+          </div>
         </div>
 
-        <input
-          type="text"
-          className={inputStyles}
-          placeholder="Author User ID *"
-          value={authorUserId}
-          onChange={(e) => setAuthorUserId(e.target.value)}
-          required
-        />
-
-        <input
-          type="text"
-          className={inputStyles}
-          placeholder="Assigned User ID"
-          value={assignedUserId}
-          onChange={(e) => setAssignedUserId(e.target.value)}
-        />
-
-        {id === null && (
+        <div>
+          <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+            Author User ID *
+          </label>
           <input
             type="text"
             className={inputStyles}
-            placeholder="Project ID *"
-            value={projectId}
-            onChange={(e) => setProjectId(e.target.value)}
-            required={id === null}
+            value={authorUserId}
+            onChange={(e) => setAuthorUserId(e.target.value)}
+            required
           />
+        </div>
+
+        <div>
+          <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+            Assigned User ID
+          </label>
+          <input
+            type="text"
+            className={inputStyles}
+            value={assignedUserId}
+            onChange={(e) => setAssignedUserId(e.target.value)}
+          />
+        </div>
+
+        {id === null && (
+          <div>
+            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+              Project ID *
+            </label>
+            <input
+              type="text"
+              className={inputStyles}
+              value={projectId}
+              onChange={(e) => setProjectId(e.target.value)}
+              required={id === null}
+            />
+          </div>
         )}
 
         <button

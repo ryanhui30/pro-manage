@@ -92,6 +92,17 @@ export const api = createApi({
             }),
             invalidatesTags: ["Projects"]
         }),
+        deleteProject: build.mutation<void, number>({
+            query: (projectId) => ({
+                url: `projects/${projectId}`,
+                method: 'DELETE',
+            }),
+            invalidatesTags: (result, error, projectId) => [
+                { type: 'Projects', id: projectId },
+                // Also invalidate any cached tasks that belonged to this project
+                { type: 'Tasks', id: 'LIST' }
+            ],
+        }),
         getTasks: build.query<Task[], { projectId: number }>({
             query: ({ projectId }) => `tasks?projectId=${projectId}`,
             providesTags: (result) =>
@@ -148,6 +159,7 @@ export const api = createApi({
 export const {
     useGetProjectsQuery,
     useCreateProjectMutation,
+    useDeleteProjectMutation,
     useGetTasksQuery,
     useCreateTaskMutation,
     useUpdateTaskStatusMutation,
