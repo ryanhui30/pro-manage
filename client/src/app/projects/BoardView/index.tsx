@@ -309,10 +309,6 @@ const Task = ({ task, onDelete }: TaskProps) => {
                         )}
                     </div>
                     <div className="flex items-center text-gray-500 dark:text-neutral-500">
-                        <MessageSquareMore size={20} />
-                        <span className="ml-1 text-sm dark:text-neutral-400">
-                            {numberOfComments}
-                        </span>
                     </div>
                 </div>
             </div>
