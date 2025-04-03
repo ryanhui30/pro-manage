@@ -103,12 +103,15 @@ export const api = createApi({
                 { type: 'Tasks', id: 'LIST' }
             ],
         }),
-        getTasks: build.query<Task[], { projectId: number }>({
-            query: ({ projectId }) => `tasks?projectId=${projectId}`,
+        getTasks: build.query<Task[], { projectId?: number }>({
+            query: ({ projectId }) => ({
+              url: 'tasks',
+              params: projectId ? { projectId } : {} // Only include projectId if provided
+            }),
             providesTags: (result) =>
               result
-                ? result.map(({ id }) => ({ type: "Tasks" as const, id }))
-                : [{ type: "Tasks" as const }],
+                ? [...result.map(({ id }) => ({ type: 'Tasks' as const, id })), 'Tasks']
+                : ['Tasks'],
         }),
         getTasksByUser: build.query<Task[], number>({
             query: (userId) => `tasks/user/${userId}`,

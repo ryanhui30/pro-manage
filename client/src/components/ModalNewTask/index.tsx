@@ -7,9 +7,10 @@ type Props = {
   isOpen: boolean;
   onClose: () => void;
   id?: string | null;
+  projectId?: number; // Added this prop
 };
 
-const ModalNewTask = ({ isOpen, onClose, id = null }: Props) => {
+const ModalNewTask = ({ isOpen, onClose, id = null, projectId }: Props) => {
   const [createTask, { isLoading }] = useCreateTaskMutation();
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
@@ -20,7 +21,6 @@ const ModalNewTask = ({ isOpen, onClose, id = null }: Props) => {
   const [dueDate, setDueDate] = useState("");
   const [authorUserId, setAuthorUserId] = useState("");
   const [assignedUserId, setAssignedUserId] = useState("");
-  const [projectId, setProjectId] = useState("");
   const [error, setError] = useState("");
 
   const handleSubmit = async () => {
@@ -62,7 +62,6 @@ const ModalNewTask = ({ isOpen, onClose, id = null }: Props) => {
       setDueDate("");
       setAuthorUserId("");
       setAssignedUserId("");
-      setProjectId("");
       onClose();
     } catch (error) {
       setError("Failed to create task. Please try again.");

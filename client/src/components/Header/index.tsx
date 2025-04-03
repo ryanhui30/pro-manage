@@ -4,6 +4,7 @@ type Props = {
     name: React.ReactNode;  // Changed from string to ReactNode
     buttonComponent?: ReactNode;
     isSmallText?: boolean;
+    className?: string;  // Add this line
 }
 
 const Header = ({ name, buttonComponent, isSmallText = false }: Props) => {
