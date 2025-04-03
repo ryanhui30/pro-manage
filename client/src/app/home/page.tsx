@@ -152,6 +152,12 @@ const HomePage = () => {
 
   return (
     <div className="container h-full w-[100%] bg-gray-100 bg-transparent p-8">
+      <ModalNewTask
+        isOpen={isModalNewTaskOpen}
+        onClose={() => setIsModalNewTaskOpen(false)}
+        projectId={selectedProjectId}
+      />
+
       <div className="flex justify-between items-center mb-4">
         <Header name="Dashboard" />
         <div className="flex items-center gap-4">
@@ -257,11 +263,6 @@ const HomePage = () => {
           </div>
         </div>
       </div>
-
-      <ModalNewTask
-        isOpen={isModalNewTaskOpen}
-        onClose={() => setIsModalNewTaskOpen(false)}
-      />
     </div>
   );
 };

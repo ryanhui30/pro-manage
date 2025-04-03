@@ -6,21 +6,22 @@ import { Task as TaskType } from "@/state/api";
 import { EllipsisVertical, MessageSquareMore, Plus } from 'lucide-react';
 import { format } from "date-fns";
 import Image from "next/image";
+import ModalNewTask from "@/components/ModalNewTask";
 
 type BoardProps = {
     id: string;
-    setIsModalNewTaskOpen: (isOpen: boolean) => void;
 };
 
 const taskStatus = ["To Do", "Work In Progress", "Under Review", "Complete"];
 
-const BoardView = ({ id, setIsModalNewTaskOpen }: BoardProps ) => {
+const BoardView = ({ id }: BoardProps ) => {
     const {
         data: tasks,
         isLoading,
         error,
     } = useGetTasksQuery({ projectId: Number(id) });
     const [updateTaskStatus] = useUpdateTaskStatusMutation();
+    const [isModalNewTaskOpen, setIsModalNewTaskOpen] = useState(false);
 
     const moveTask = (taskId: number, toStatus: string) => {
         updateTaskStatus({ taskId, status: toStatus })
@@ -30,19 +31,27 @@ const BoardView = ({ id, setIsModalNewTaskOpen }: BoardProps ) => {
     if (error) return <div>An error occurred while fetching tasks</div>;
 
     return (
-        <DndProvider backend={HTML5Backend}>
-            <div className="grid grid-cols-1 gap-4 p-4 md:grid-cols-2 xl:grid-cols-4">
-                {taskStatus.map((status) => (
-                    <TaskColumn
-                        key={status}
-                        status={status}
-                        tasks={tasks || []}
-                        moveTask={moveTask}
-                        setIsModalNewTaskOpen={setIsModalNewTaskOpen}
-                    />
-                ))}
-            </div>
-        </DndProvider>
+        <>
+            <ModalNewTask
+                isOpen={isModalNewTaskOpen}
+                onClose={() => setIsModalNewTaskOpen(false)}
+                projectId={Number(id)}
+            />
+
+            <DndProvider backend={HTML5Backend}>
+                <div className="grid grid-cols-1 gap-4 p-4 md:grid-cols-2 xl:grid-cols-4">
+                    {taskStatus.map((status) => (
+                        <TaskColumn
+                            key={status}
+                            status={status}
+                            tasks={tasks || []}
+                            moveTask={moveTask}
+                            setIsModalNewTaskOpen={setIsModalNewTaskOpen}
+                        />
+                    ))}
+                </div>
+            </DndProvider>
+        </>
     );
 };
 

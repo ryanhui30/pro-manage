@@ -1,3 +1,5 @@
+"use client";
+
 import Modal from "@/components/Modal";
 import { Priority, Status, useCreateTaskMutation } from "@/state/api";
 import React, { useState } from "react";
@@ -7,10 +9,17 @@ type Props = {
   isOpen: boolean;
   onClose: () => void;
   id?: string | null;
-  projectId?: number; // Added this prop
+  projectId?: number;
+  onProjectIdChange?: (newProjectId: number) => void;
 };
 
-const ModalNewTask = ({ isOpen, onClose, id = null, projectId }: Props) => {
+const ModalNewTask = ({
+  isOpen,
+  onClose,
+  id = null,
+  projectId,
+  onProjectIdChange
+}: Props) => {
   const [createTask, { isLoading }] = useCreateTaskMutation();
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
@@ -31,13 +40,14 @@ const ModalNewTask = ({ isOpen, onClose, id = null, projectId }: Props) => {
     }
 
     try {
-      const formattedStartDate = startDate ? formatISO(new Date(startDate), {
-        representation: "complete",
-      }) : undefined;
+      const formattedStartDate = formatISO(new Date(startDate), { representation: "complete" });
+      const formattedDueDate = formatISO(new Date(dueDate), { representation: "complete" });
 
-      const formattedDueDate = dueDate ? formatISO(new Date(dueDate), {
-        representation: "complete",
-      }) : undefined;
+      const resolvedProjectId = id !== null
+        ? Number(id)
+        : projectId !== undefined
+          ? projectId
+          : 0;
 
       await createTask({
         title,
@@ -49,7 +59,7 @@ const ModalNewTask = ({ isOpen, onClose, id = null, projectId }: Props) => {
         dueDate: formattedDueDate,
         authorUserId: parseInt(authorUserId),
         assignedUserId: assignedUserId ? parseInt(assignedUserId) : undefined,
-        projectId: id !== null ? Number(id) : Number(projectId),
+        projectId: resolvedProjectId,
       }).unwrap();
 
       // Reset form
@@ -70,7 +80,14 @@ const ModalNewTask = ({ isOpen, onClose, id = null, projectId }: Props) => {
   };
 
   const isFormValid = () => {
-    return title && authorUserId && (id !== null || projectId);
+    return (
+      title.trim() !== "" &&
+      description.trim() !== "" &&
+      authorUserId.trim() !== "" &&
+      startDate.trim() !== "" &&
+      dueDate.trim() !== "" &&
+      (id !== null || projectId !== undefined)
+    );
   };
 
   const selectStyles = "mb-4 block w-full rounded border border-gray-300 px-3 py-2 dark:border-dark-tertiary dark:bg-dark-tertiary dark:text-white dark:focus:outline-none";
@@ -98,9 +115,11 @@ const ModalNewTask = ({ isOpen, onClose, id = null, projectId }: Props) => {
 
         <textarea
           className={inputStyles}
-          placeholder="Description"
+          placeholder="Description *"
           value={description}
           onChange={(e) => setDescription(e.target.value)}
+          rows={3}
+          required
         />
 
         <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 sm:gap-2">
@@ -156,6 +175,7 @@ const ModalNewTask = ({ isOpen, onClose, id = null, projectId }: Props) => {
               className={inputStyles}
               value={startDate}
               onChange={(e) => setStartDate(e.target.value)}
+              required
             />
           </div>
           <div className="space-y-1">
@@ -167,6 +187,7 @@ const ModalNewTask = ({ isOpen, onClose, id = null, projectId }: Props) => {
               className={inputStyles}
               value={dueDate}
               onChange={(e) => setDueDate(e.target.value)}
+              required
             />
           </div>
         </div>
@@ -176,11 +197,12 @@ const ModalNewTask = ({ isOpen, onClose, id = null, projectId }: Props) => {
             Author User ID *
           </label>
           <input
-            type="text"
+            type="number"
             className={inputStyles}
             value={authorUserId}
             onChange={(e) => setAuthorUserId(e.target.value)}
             required
+            min="1"
           />
         </div>
 
@@ -189,10 +211,11 @@ const ModalNewTask = ({ isOpen, onClose, id = null, projectId }: Props) => {
             Assigned User ID
           </label>
           <input
-            type="text"
+            type="number"
             className={inputStyles}
             value={assignedUserId}
             onChange={(e) => setAssignedUserId(e.target.value)}
+            min="1"
           />
         </div>
 
@@ -202,11 +225,17 @@ const ModalNewTask = ({ isOpen, onClose, id = null, projectId }: Props) => {
               Project ID *
             </label>
             <input
-              type="text"
+              type="number"
               className={inputStyles}
-              value={projectId}
-              onChange={(e) => setProjectId(e.target.value)}
+              value={projectId ?? ''}
+              onChange={(e) => {
+                const value = e.target.value;
+                if (value && onProjectIdChange) {
+                  onProjectIdChange(Number(value));
+                }
+              }}
               required={id === null}
+              min="1"
             />
           </div>
         )}
@@ -214,9 +243,9 @@ const ModalNewTask = ({ isOpen, onClose, id = null, projectId }: Props) => {
         <button
           type="submit"
           className={`focus-offset-2 mt-4 flex w-full justify-center rounded-md border border-transparent bg-blue-primary px-4 py-2 text-base font-medium text-white shadow-sm hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-600 ${
-            isLoading ? "cursor-not-allowed opacity-50" : ""
+            !isFormValid() || isLoading ? "cursor-not-allowed opacity-50" : ""
           }`}
-          disabled={isLoading}
+          disabled={!isFormValid() || isLoading}
         >
           {isLoading ? "Creating..." : "Create Task"}
         </button>
