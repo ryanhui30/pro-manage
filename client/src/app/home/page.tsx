@@ -1,5 +1,4 @@
 "use client";
-
 import {
   Priority,
   Project,
@@ -10,7 +9,7 @@ import {
 } from "@/state/api";
 import React, { useState } from "react";
 import { useAppSelector } from "../redux";
-import { DataGrid, GridColDef } from "@mui/x-data-grid";
+import { DataGrid, GridColDef, GridRowSelectionModel } from "@mui/x-data-grid";
 import Header from "@/components/Header";
 import {
   Bar,
@@ -27,7 +26,7 @@ import {
 } from "recharts";
 import { dataGridClassNames, dataGridSxStyles } from "@/lib/utils";
 import ModalNewTask from "@/components/ModalNewTask";
-import { PlusSquare } from "lucide-react";
+import { PlusSquare, Trash2 } from "lucide-react";
 
 const PRIORITY_COLORS: Record<Priority, string> = {
   Backlog: "#909090",
@@ -42,6 +41,7 @@ const COLORS = ["#0088FE", "#00C49F", "#FFBB28", "#FF8042"];
 const HomePage = () => {
   const [isModalNewTaskOpen, setIsModalNewTaskOpen] = useState(false);
   const [selectedProjectId, setSelectedProjectId] = useState<number>(1);
+  const [rowSelectionModel, setRowSelectionModel] = useState<GridRowSelectionModel>([]);
   const isDarkMode = useAppSelector((state) => state.global.isDarkMode);
 
   // Data fetching
@@ -81,7 +81,7 @@ const HomePage = () => {
       width: 100,
       renderCell: (params) => (
         <button
-          onClick={() => handleDeleteTask(params.row.id)}
+          onClick={() => handleDeleteTask([params.row.id])}
           className="text-red-500 hover:text-red-700"
         >
           Delete
@@ -90,17 +90,18 @@ const HomePage = () => {
     },
   ];
 
-  const handleDeleteTask = async (taskId: number) => {
-    if (!window.confirm("Are you sure you want to delete this task?")) {
+  const handleDeleteTask = async (taskIds: number[]) => {
+    if (!window.confirm(`Are you sure you want to delete ${taskIds.length > 1 ? 'these tasks' : 'this task'}?`)) {
       return;
     }
 
     try {
-      await deleteTask(taskId).unwrap();
-      alert("Task deleted successfully");
+      await Promise.all(taskIds.map(id => deleteTask(id).unwrap()));
+      alert(`${taskIds.length} task${taskIds.length > 1 ? 's' : ''} deleted successfully`);
+      setRowSelectionModel([]);
       refetchTasks();
     } catch {
-      alert("Failed to delete task. Please try again.");
+      alert("Failed to delete tasks. Please try again.");
     }
   };
 
@@ -242,18 +243,32 @@ const HomePage = () => {
             <h3 className="text-lg font-semibold dark:text-white">
               Your Tasks
             </h3>
-            <button
-              className="flex items-center rounded bg-blue-500 px-4 py-2 font-bold text-white hover:bg-blue-700"
-              onClick={() => setIsModalNewTaskOpen(true)}
-            >
-              <PlusSquare className="mr-2 h-5 w-5" /> Add Task
-            </button>
+            <div className="flex gap-2">
+              {rowSelectionModel.length > 0 && (
+                <button
+                  className="flex items-center rounded bg-red-500 px-4 py-2 font-bold text-white hover:bg-red-700"
+                  onClick={() => handleDeleteTask(rowSelectionModel as number[])}
+                >
+                  <Trash2 className="mr-2 h-5 w-5" /> Delete Selected ({rowSelectionModel.length})
+                </button>
+              )}
+              <button
+                className="flex items-center rounded bg-blue-500 px-4 py-2 font-bold text-white hover:bg-blue-700"
+                onClick={() => setIsModalNewTaskOpen(true)}
+              >
+                <PlusSquare className="mr-2 h-5 w-5" /> Add Task
+              </button>
+            </div>
           </div>
           <div style={{ height: 400, width: "100%" }}>
             <DataGrid
               rows={tasks}
               columns={taskColumns}
               checkboxSelection
+              onRowSelectionModelChange={(newRowSelectionModel) => {
+                setRowSelectionModel(newRowSelectionModel);
+              }}
+              rowSelectionModel={rowSelectionModel}
               loading={tasksLoading}
               getRowClassName={() => "data-grid-row"}
               getCellClassName={() => "data-grid-cell"}
