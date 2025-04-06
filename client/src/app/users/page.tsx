@@ -57,9 +57,7 @@ const Users = () => {
   const isDarkMode = useAppSelector((state) => state.global.isDarkMode);
 
   const filteredUsers = users?.filter(user =>
-    user.username.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    user.userId.toString().includes(searchTerm)
-  ) || [];
+    user.username.toLowerCase().includes(searchTerm.toLowerCase()));
 
   const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setSearchTerm(e.target.value);

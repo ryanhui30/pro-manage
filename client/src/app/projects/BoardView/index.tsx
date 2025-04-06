@@ -3,7 +3,7 @@ import React, { useState, useRef, useEffect } from 'react';
 import { DndProvider, useDrag, useDrop } from "react-dnd";
 import { HTML5Backend } from "react-dnd-html5-backend";
 import { Task as TaskType } from "@/state/api";
-import { EllipsisVertical, MessageSquareMore, Plus } from 'lucide-react';
+import { EllipsisVertical, Plus } from 'lucide-react';
 import { format } from "date-fns";
 import Image from "next/image";
 import ModalNewTask from "@/components/ModalNewTask";
@@ -111,7 +111,7 @@ const TaskColumn = ({
                     className={`w-2 !bg-[${statusColor[status]}] rounded-s-lg`}
                     style={{ backgroundColor: statusColor[status] }}
                 />
-                <div className="flex w-full items-center justify-between rounded-e-lg bg-white px-5 py-4 dark:bg-dark-secondary-color">
+                <div className="flex w-full items-center justify-between rounded-e-lg bg-white px-5 py-4 dark:bg-dark-secondary">
                     <h3 className="flex items-center text-lg font-semibold dark:text-white">
                         {status}{" "}
                         <span

@@ -26,11 +26,7 @@ const Teams = () => {
   const isDarkMode = useAppSelector((state) => state.global.isDarkMode);
 
   const filteredTeams = teams?.filter(team =>
-    team.teamName.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    team.productOwnerUsername.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    team.projectManagerUsername.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    team.id.toString().includes(searchTerm)
-  ) || [];
+    team.teamName.toLowerCase().includes(searchTerm.toLowerCase()));
 
   const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setSearchTerm(e.target.value);
