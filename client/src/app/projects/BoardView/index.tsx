@@ -10,6 +10,7 @@ import ModalNewTask from "@/components/ModalNewTask";
 
 type BoardProps = {
     id: string;
+    setIsModalNewTaskOpen: React.Dispatch<React.SetStateAction<boolean>>;
 };
 
 const taskStatus = ["To Do", "Work In Progress", "Under Review", "Complete"];
