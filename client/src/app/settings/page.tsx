@@ -34,22 +34,6 @@ const Settings = () => {
                 {currentUser?.user?.username || "No email"}
               </div>
             </div>
-
-            {/* Edit Button (optional) */}
-            <div className="text-left pt-4">
-              <button
-                className={`rounded px-4 py-2 font-medium text-white ${
-                  isDarkMode
-                    ? 'bg-blue-600 hover:bg-blue-700'
-                    : 'bg-blue-500 hover:bg-blue-600'
-                }`}
-                onClick={() => {
-                  // Add edit functionality here
-                }}
-              >
-                Edit Profile
-              </button>
-            </div>
           </div>
         </div>
       </div>
