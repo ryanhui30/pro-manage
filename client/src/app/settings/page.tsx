@@ -3,15 +3,11 @@
 import Header from "@/components/Header";
 import React from "react";
 import { useAppSelector } from "../redux";
+import { useGetAuthUserQuery } from "@/state/api";
 
 const Settings = () => {
   const isDarkMode = useAppSelector((state) => state.global.isDarkMode);
-  const userSettings = {
-    username: "johndoe",
-    email: "john.doe@example.com",
-    teamName: "Development Team",
-    roleName: "Developer",
-  };
+  const { data: currentUser, isLoading, error } = useGetAuthUserQuery({});
 
   const labelStyles = "block text-sm font-medium mb-1 dark:text-gray-300";
   const textStyles = `mt-1 block w-full rounded-md border ${
@@ -20,41 +16,38 @@ const Settings = () => {
       : 'bg-gray-50 border-gray-200 text-gray-700'
   } p-2 shadow-sm sm:text-sm`;
 
+  if (isLoading) return <div className="p-6">Loading user settings...</div>;
+  if (error) return <div className="p-6 text-red-500">Error loading user settings</div>;
+
   return (
     <div className="flex w-full flex-col p-6">
-      <Header name="User Settings" />
+      <Header name="Account Settings" />
 
-      {/* Left-aligned container matching other pages */}
       <div className={`rounded-lg ${isDarkMode ? 'bg-dark-secondary' : 'bg-white'} shadow`}>
         <div className="p-6">
           <div className="space-y-4">
+
+            {/* Username Field */}
             <div className="text-left">
               <label className={labelStyles}>Username</label>
-              <div className={textStyles}>{userSettings.username}</div>
-            </div>
-            <div className="text-left">
-              <label className={labelStyles}>Email</label>
-              <div className={textStyles}>{userSettings.email}</div>
-            </div>
-            <div className="text-left">
-              <label className={labelStyles}>Team</label>
-              <div className={textStyles}>{userSettings.teamName}</div>
-            </div>
-            <div className="text-left">
-              <label className={labelStyles}>Role</label>
-              <div className={textStyles}>{userSettings.roleName}</div>
+              <div className={textStyles}>
+                {currentUser?.user?.username || "No email"}
+              </div>
             </div>
 
-            {/* Left-aligned Save Changes Button */}
-            <div className="text-left">
+            {/* Edit Button (optional) */}
+            <div className="text-left pt-4">
               <button
-                className={`mt-6 rounded px-4 py-2 font-medium text-white ${
+                className={`rounded px-4 py-2 font-medium text-white ${
                   isDarkMode
                     ? 'bg-blue-600 hover:bg-blue-700'
                     : 'bg-blue-500 hover:bg-blue-600'
                 }`}
+                onClick={() => {
+                  // Add edit functionality here
+                }}
               >
-                Save Changes
+                Edit Profile
               </button>
             </div>
           </div>

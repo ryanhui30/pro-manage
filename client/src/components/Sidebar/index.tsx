@@ -2,23 +2,24 @@
 
 import { useAppDispatch, useAppSelector } from "@/app/redux";
 import React, { useState } from "react";
-import { LockIcon,
-        LucideIcon,
-        Home,
-        X,
-        Briefcase,
-        Search,
-        Settings,
-        User,
-        Users,
-        ChevronUp,
-        ChevronDown,
-        AlertCircle,
-        ShieldAlert,
-        AlertTriangle,
-        AlertOctagon,
-        Layers3
-    } from "lucide-react";
+import {
+  LockIcon,
+  LucideIcon,
+  Home,
+  X,
+  Briefcase,
+  Search,
+  Settings,
+  User,
+  Users,
+  ChevronUp,
+  ChevronDown,
+  AlertCircle,
+  ShieldAlert,
+  AlertTriangle,
+  AlertOctagon,
+  Layers3
+} from "lucide-react";
 import { usePathname } from "next/navigation";
 import Image from "next/image";
 import Link from "next/link";
@@ -26,211 +27,210 @@ import { setIsSidebarCollasped } from "@/state";
 import { useGetAuthUserQuery, useGetProjectsQuery } from "@/state/api";
 import { signOut } from "aws-amplify/auth";
 
-
 const Sidebar = () => {
-    const [showProjects, setShowProjects] = useState(true);
-    const [showPriority, setShowPriority] = useState(true);
+  const [showProjects, setShowProjects] = useState(true);
+  const [showPriority, setShowPriority] = useState(true);
+  const [showNavigation, setShowNavigation] = useState(true);
 
-    const { data: projects } = useGetProjectsQuery();
+  const { data: projects } = useGetProjectsQuery();
+  const dispatch = useAppDispatch();
+  const isSidebarCollapsed = useAppSelector(
+    (state) => state.global.isSidebarCollasped,
+  );
+  const isDarkMode = useAppSelector((state) => state.global.isDarkMode);
 
-    const dispatch = useAppDispatch();
-    const isSidebarCollapsed = useAppSelector(
-        (state) => state.global.isSidebarCollasped,
-    );
+  const { data: currentUser } = useGetAuthUserQuery({});
+  const handleSignOut = async (e: React.MouseEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    try {
+      await signOut();
+    } catch (error) {
+      console.error("Error signing out: ", error);
+    }
+  };
 
-    const { data: currentUser } = useGetAuthUserQuery({});
-    const handleSignOut = async () => {
-        try {
-        await signOut();
-        } catch (error) {
-        console.error("Error signing out: ", error);
-        }
-    };
-    if (!currentUser) return null;
-    const currentUserDetails = currentUser?.userDetails;
+  if (!currentUser) return null;
 
-    const sidebarClassNames = `fixed flex flex-col h-[100%] justify-between shadow-xl
-        transition-all duration-300 h-full z-40 dark:bg-black overflow-y-auto bg-white
-        ${isSidebarCollapsed ? "w-0 hidden" : "w-64"}
-    `;
+  const username = currentUser?.userDetails?.username || currentUser?.user?.username || "Guest";
+  const profilePictureUrl = currentUser?.userDetails?.profilePictureUrl;
 
-    return (
+  const sidebarClassNames = `fixed flex flex-col h-[100%] justify-between shadow-xl
+    transition-all duration-100 h-full z-40 dark:bg-black overflow-y-auto bg-white
+    ${isSidebarCollapsed ? "w-0 hidden" : "w-64"}`;
+
+  return (
     <div className={sidebarClassNames}>
-        <div className="flex h-[100%] w-full flex-col justify-start">
-            {/* Top Logo */}
+      <div className="flex h-[calc(100vh-56px)] w-full flex-col justify-between">
+        <div>
+          {/* Top Logo */}
+          <div className="z-50 flex min-h-[56px] items-center justify-between bg-white px-6 pt-3 dark:bg-black transition-colors duration-100">
+            <div className="text-xl font-bold text-gray-800 dark:text-white transition-colors duration-100">
+              Project Manager
+            </div>
+            {!isSidebarCollapsed && (
+              <button
+                className="py-3"
+                onClick={() => dispatch(setIsSidebarCollasped(true))}
+              >
+                <X className="h-6 w-6 text-gray-800 hover:text-gray-500 dark:text-white transition-colors duration-100" />
+              </button>
+            )}
+          </div>
 
-            <div className="z-50 flex min-h-[56px] w-64 items-center justify-between bg-white px-6 pt-3 dark:bg-black">
-                <div className="text-xl font-bold text-gray-800 dark:text-white">
-                    Project Manager
-                </div>
-                {isSidebarCollapsed ? null : (
-                    <button
-                        className="py-3"
-                        onClick={() =>
-                            {dispatch(setIsSidebarCollasped(!isSidebarCollapsed));
-                    }}
-                    >
-                        <X className="h-6 w-6 text-gray-800 hover:text-gray-500 dark:text-white" />
-                    </button>
+          {/* User Profile */}
+          <Link href="/settings" className="w-full">
+            <div className="flex items-center gap-4 border-y border-gray-200 px-6 py-4 dark:border-gray-700 hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors duration-100">
+              <div className="flex-shrink-0">
+                {profilePictureUrl ? (
+                  <Image
+                    src={`/${profilePictureUrl}`}
+                    alt="User avatar"
+                    width={40}
+                    height={40}
+                    className="rounded-full"
+                  />
+                ) : (
+                  <div className="flex h-10 w-10 items-center justify-center rounded-full bg-gray-200 dark:bg-gray-700 transition-colors duration-100">
+                    <User className="h-5 w-5 text-gray-600 dark:text-gray-300 transition-colors duration-100" />
+                  </div>
                 )}
-            </div>
-            {/* Team */}
-            <div className="flex items-center gap-5 border-y-[1.5px] border-gray-200 px-8 py-4 dark:border-gray-700">
-                <Image src="/logo.svg" alt="Logo" width={40} height={40} />
-                <div>
-                    <h3 className="text-md font-bold tracking-wide dark:text-gray-200">
-                        User: johndoe
-                    </h3>
-                    <div className="mt-1 flex items-start gap-2">
-                        <LockIcon className="mt-[0.1 rem] h-3 w-3 text-gray-500 dark:text-gray-400" />
-                        <p className="text xs text-gray-500">Private</p>
-                    </div>
+              </div>
+              <div className="overflow-hidden">
+                <h3 className="text-md font-bold truncate text-gray-800 dark:text-gray-200 transition-colors duration-100">
+                  {username}
+                </h3>
+                <div className="flex items-center gap-2 mt-1">
+                  <LockIcon className="h-3 w-3 text-gray-500 dark:text-gray-400 transition-colors duration-100" />
+                  <p className="text-xs truncate text-gray-500 dark:text-gray-400 transition-colors duration-100">Private</p>
                 </div>
+              </div>
             </div>
-            {/* Navbar Links */}
-            <nav className="z-10 w-full">
+          </Link>
+
+          {/* Main Navigation - Collapsible */}
+          <div className="border-t border-gray-200 dark:border-gray-700 transition-colors duration-100">
+            <button
+              onClick={() => setShowNavigation((prev) => !prev)}
+              className="flex w-full items-center justify-between px-6 py-3 text-gray-800 hover:bg-gray-100 dark:text-gray-200 dark:hover:bg-gray-800 transition-colors duration-100"
+            >
+              <span className="font-medium">Navigation</span>
+              {showNavigation ? (
+                <ChevronUp className="h-5 w-5" />
+              ) : (
+                <ChevronDown className="h-5 w-5" />
+              )}
+            </button>
+
+            {showNavigation && (
+              <nav className="w-full">
                 <SidebarLink icon={Home} label="Home" href="/" />
                 <SidebarLink icon={Briefcase} label="Timeline" href="/timeline" />
                 <SidebarLink icon={Search} label="Search" href="/search" />
                 <SidebarLink icon={User} label="Users" href="/users" />
                 <SidebarLink icon={Users} label="Teams" href="/teams" />
                 <SidebarLink icon={Settings} label="Settings" href="/settings" />
-            </nav>
+              </nav>
+            )}
+          </div>
 
-            {/* Projects Links */}
+          {/* Projects Section */}
+          <div className="border-t border-gray-200 dark:border-gray-700 transition-colors duration-100">
             <button
-                onClick={() => setShowProjects((prev) => !prev)}
-                className="flex w-full items-center justify-between px-8 py-3 text-gray-500"
+              onClick={() => setShowProjects((prev) => !prev)}
+              className="flex w-full items-center justify-between px-6 py-3 text-gray-800 hover:bg-gray-100 dark:text-gray-200 dark:hover:bg-gray-800 transition-colors duration-100"
             >
-                <span className="">Projects</span>
-                {showProjects ? (
-                    <ChevronUp className="h-5 w-5" />
-                ) : (
-                    <ChevronDown className="h-5 w-5" />
-                )}
+              <span className="font-medium">Projects</span>
+              {showProjects ? (
+                <ChevronUp className="h-5 w-5" />
+              ) : (
+                <ChevronDown className="h-5 w-5" />
+              )}
             </button>
 
-            {/* Projects List */}
-            {showProjects &&
-                projects?.map((project) => (
-                    <SidebarLink
+            {showProjects && (
+              <div className="pb-2">
+                {projects?.map((project) => (
+                  <SidebarLink
                     key={project.id}
                     icon={Briefcase}
                     label={project.name}
                     href={`/projects/${project.id}`}
-                    />
-            ))}
+                  />
+                ))}
+              </div>
+            )}
+          </div>
 
-            {/* Priorities Links */}
+          {/* Priority Section */}
+          <div className="border-t border-gray-200 dark:border-gray-700 transition-colors duration-100">
             <button
-                onClick={() => setShowPriority((prev) => !prev)}
-                className="flex w-full items-center justify-between px-8 py-3 text-gray-500"
+              onClick={() => setShowPriority((prev) => !prev)}
+              className="flex w-full items-center justify-between px-6 py-3 text-gray-800 hover:bg-gray-100 dark:text-gray-200 dark:hover:bg-gray-800 transition-colors duration-100"
             >
-                <span className="">Priority</span>
-                {showPriority ? (
-                    <ChevronUp className="h-5 w-5" />
-                ) : (
-                    <ChevronDown className="h-5 w-5" />
-                )}
+              <span className="font-medium">Priority</span>
+              {showPriority ? (
+                <ChevronUp className="h-5 w-5" />
+              ) : (
+                <ChevronDown className="h-5 w-5" />
+              )}
             </button>
 
             {showPriority && (
-                <>
-                    <SidebarLink
-                        icon={AlertCircle}
-                        label="Urgent"
-                        href="/priority/urgent"
-                    />
-                    <SidebarLink
-                        icon={ShieldAlert}
-                        label="High"
-                        href="/priority/high"
-                    />
-                    <SidebarLink
-                        icon={AlertTriangle}
-                        label="Medium"
-                        href="/priority/medium"
-                    />
-                    <SidebarLink
-                        icon={AlertOctagon}
-                        label="Low"
-                        href="/priority/low"
-                    />
-                    <SidebarLink
-                        icon={Layers3}
-                        label="Backlog"
-                        href="/priority/backlog"
-                    />
-                </>
-            )}
-        </div>
-        <div className="z-10 mt-32 flex w-full flex-col items-center gap-4 bg-white px-8 py-4 dark:bg-black md:hidden">
-        <div className="flex w-full items-center">
-          <div className="align-center flex h-9 w-9 justify-center">
-            {!!currentUserDetails?.profilePictureUrl ? (
-              <Image
-                src={`/${currentUserDetails?.profilePictureUrl}`}
-                alt={currentUserDetails?.username || "User Profile Picture"}
-                width={100}
-                height={50}
-                className="h-full rounded-full object-cover"
-              />
-            ) : (
-              <User className="h-6 w-6 cursor-pointer self-center rounded-full dark:text-white" />
+              <div className="pb-2">
+                <SidebarLink icon={AlertCircle} label="Urgent" href="/priority/urgent" />
+                <SidebarLink icon={ShieldAlert} label="High" href="/priority/high" />
+                <SidebarLink icon={AlertTriangle} label="Medium" href="/priority/medium" />
+                <SidebarLink icon={AlertOctagon} label="Low" href="/priority/low" />
+                <SidebarLink icon={Layers3} label="Backlog" href="/priority/backlog" />
+              </div>
             )}
           </div>
-          <span className="mx-3 text-gray-800 dark:text-white">
-            {currentUserDetails?.username}
-          </span>
-          <button
-            className="self-start rounded bg-blue-400 px-4 py-2 text-xs font-bold text-white hover:bg-blue-500 md:block"
-            onClick={handleSignOut}
-          >
-            Sign out
-          </button>
+        </div>
+
+        {/* Mobile Sign Out - Only visible on mobile */}
+        <div className="md:hidden border-t border-gray-200 dark:border-gray-700 transition-colors duration-100">
+          <div className="flex items-center justify-between p-4">
+            <button
+              className="flex items-center rounded bg-blue-500 px-4 py-2 font-medium text-white hover:bg-blue-600 transition-colors duration-100"
+              onClick={handleSignOut}
+            >
+              Sign out
+            </button>
+          </div>
         </div>
       </div>
     </div>
-    );
+  );
 };
 
 interface SidebarLinkProps {
-    href: string;
-    icon: LucideIcon;
-    label: string;
-    // isCollasped: boolean;
+  href: string;
+  icon: LucideIcon;
+  label: string;
 }
 
-const SidebarLink = ({
-    href,
-    icon: Icon,
-    label,
-    // isCollasped
+const SidebarLink = ({ href, icon: Icon, label }: SidebarLinkProps) => {
+  const pathname = usePathname();
+  const isActive = pathname === href;
 
-}: SidebarLinkProps) => {
-    const pathname = usePathname();
-    const isActive =
-        pathname === href || (pathname=== "/" && href === "/dashboard");
-
-    return (
-        <Link href={href} className="w-full">
-            <div
-                className={`relative flex cursor-pointer items-center gap-3 transition-colors
-                hover:bg-gray-100 dark:bg-black dark:hover:bg-gray-700 ${
-                    isActive ? "bg-gray-100 text-white dark:bg-gray-600" : ""
-                } justify-start px-8 py-3`}
-            >
-                {isActive && (
-                    <div className="absolute left-0 top-0 h-[100%] w-[5px] bg-blue-200" />
-                )}
-
-                <Icon className="h-6 w-6 text-gray-800 dark:text-gray-100" />
-                <span className={`font-medium text-gray-800 dark:text-gray-100`}>
-                    {label}
-                </span>
-            </div>
-        </Link>
-    )
-}
+  return (
+    <Link href={href} className="w-full">
+      <div
+        className={`relative flex items-center gap-3 px-6 py-3 hover:bg-gray-100 dark:hover:bg-gray-800 ${
+          isActive ? 'bg-gray-100 dark:bg-gray-700' : ''
+        } transition-colors duration-100`}
+      >
+        {isActive && (
+          <div className="absolute left-0 top-0 h-full w-1 bg-blue-500" />
+        )}
+        <Icon className={`h-5 w-5 ${isActive ? 'text-blue-500' : 'text-gray-600 dark:text-gray-300'} transition-colors duration-100`} />
+        <span className={`font-medium ${isActive ? 'text-blue-500' : 'text-gray-600 dark:text-gray-300'} transition-colors duration-100`}>
+          {label}
+        </span>
+      </div>
+    </Link>
+  );
+};
 
 export default Sidebar;
