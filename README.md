@@ -34,11 +34,10 @@
    npm install
 
 3. **Configure AWS services**:
-Set up Cognito, RDS
-Add credentials to .env (refer to .env.example)
+- Set up Cognito, RDS
+   - Add credentials to `.env` (refer to `.env.example`)
 
-
-4. **Deploy**:
+5. **Deploy**:
    ```bash
    npm run build && amplify publish
 
