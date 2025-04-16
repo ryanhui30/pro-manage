@@ -29,20 +29,20 @@
    ```bash
    git clone https://github.com/ryanhui30/project-manager.git
 
-2. **Install dependencies:
+2. **Install dependencies**:
    ```bash
    npm install
 
-3. **Configure AWS services:
+3. **Configure AWS services**:
 Set up Cognito, RDS
 Add credentials to .env (refer to .env.example)
 
 
-4. **Deploy:
+4. **Deploy**:
    ```bash
    npm run build && amplify publish
 
-## **Need Help?
+## **Need Help**?
 📩 Contact: ryanhui30@gmail.com
 🔗 Portfolio: https://ryanhui-portfolio.vercel.app/
 
