@@ -1,7 +1,7 @@
 # ProManage 🚀📊  
 **Full-Stack Project Management Platform**  
-
 [Live Demo (AWS Amplify)](https://main.d1pqkryapw8kiy.amplifyapp.com/) | [Live Demo (Vercel)](https://project-manager-orcin.vercel.app/) | [Source Code](https://github.com/ryanhui30/portfolio-3d)
+
 ---
 
 ## **Key Features**  
