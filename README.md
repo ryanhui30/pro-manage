@@ -41,6 +41,6 @@
    npm run build && amplify publish
 
 ## **Need Help**?
-📩 Contact: ryanhui30@gmail.com
-🔗 Portfolio: https://ryanhui-portfolio.vercel.app/
+📩 Contact: ryanhui30@gmail.com | 🔗 Portfolio: https://ryanhui-portfolio.vercel.app/
+
 
