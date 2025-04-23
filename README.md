@@ -1,4 +1,4 @@
-# ProManage 🚀📊  
+# Pro Manage 🚀📊  
 **Full-Stack Project Management Platform**  
 [Live Demo (AWS Amplify)](https://main.d1pqkryapw8kiy.amplifyapp.com/) | [Source Code](https://github.com/ryanhui30/portfolio-3d)
 
