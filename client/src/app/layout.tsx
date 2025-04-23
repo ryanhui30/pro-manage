@@ -6,8 +6,8 @@ import DashboardWrapper from "./dashboardWrapper";
 const inter = Inter({ subsets: ["latin"] });
 
 export const metadata: Metadata = {
-    title: "Project Manager App",
-    description: "",
+    title: "Pro Manage - App",
+    description: "Manage projects with ease",
 };
 
 export default function RootLayout({

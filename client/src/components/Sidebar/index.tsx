@@ -66,7 +66,7 @@ const Sidebar = () => {
           {/* Top Logo */}
           <div className="z-50 flex min-h-[56px] items-center justify-between bg-white px-6 pt-3 dark:bg-black transition-colors duration-100">
             <div className="text-xl font-bold text-gray-800 dark:text-white transition-colors duration-100">
-              Project Manager
+              Pro Manage
             </div>
             {!isSidebarCollapsed && (
               <button
